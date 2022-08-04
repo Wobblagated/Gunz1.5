@@ -239,17 +239,20 @@ void ZRuleQuestChallenge::OnDraw(MDrawContext* pDC)
 		pBmNumLabel = (ZBmNumLabel*)ZApplication::GetGameInterface()->GetIDLResource()->FindWidget("CQ_RoundProgress");
 		if (pBmNumLabel)
 		{
-
-			sprintf(szText, "%d/%d", m_nCurrSector + 1, GetRoundMax());
-			pBmNumLabel->SetText(szText);
+			if (m_nCurrSector != GetRoundMax())
+			{
+				sprintf(szText, "%d/%d", m_nCurrSector + 1, GetRoundMax());
+				pBmNumLabel->SetText(szText);
+			}		
 		}
+
 		MPicture* pPicture = (MPicture*)ZApplication::GetGameInterface()->GetIDLResource()->FindWidget("CQ_FadeBG");
 		if (pPicture)
 		{
 			pPicture->Show(false);
 			if (ZGetGame()->GetMatch()->GetRoundState() == MMATCH_ROUNDSTATE_FINISH)
 			{
-				if (m_nCurrSector + 1 < GetRoundMax())
+				if (m_nCurrSector + 1 <= GetRoundMax())
 				{
 					pPicture->Show(true);
 				}
