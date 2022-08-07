@@ -80,6 +80,7 @@
 #include "ZGambleItemDefine.h"
 #include "ZCombatInterface.h"
 #include "../Achievements.h"
+#include "GunZConsole.h"
 
 #ifdef LOCALE_NHNUSA
 #include "ZNHN_USA.h"
@@ -871,7 +872,7 @@ bool ZGameInterface::InitInterfaceListener()
 	SetListenerWidget("Equip_AllEquipmentFilter", ZGetEquipListFilterListener());
 	SetListenerWidget("Shop_to_Equipment", ZGetShopEquipmentCallerButtonListener() );
 
-	SetListenerWidget("Shop_ArmorEquipmentTab",  ZShopItemEquipmentTabOpen());
+	SetListenerWidget("Shop_ArmorEquipmentTab",  ZShopItemEquipmentTabOpen()); // ??
 	SetListenerWidget("Shop_WeaponEquipmentTab",  ZShopWeaponEquipmentTabOpen());	
 	SetListenerWidget("Shop_EquipListFrameCloseButton", ZShopListFrameClose());
 	SetListenerWidget("Shop_EquipListFrameOpenButton",  ZShopListFrameOpen());
@@ -881,7 +882,6 @@ bool ZGameInterface::InitInterfaceListener()
 	SetListenerWidget("Equipment_AccountTab", ZGetEquipmentAccountTabButtonListener());
 	SetListenerWidget("EquipmentList", ZGetEquipmentMyItemListBoxListener());
 	SetListenerWidget("AccountItemList", ZGetAccountItemListBoxListener());
-	SetListenerWidget("Equipment_to_Shop", ZGetEquipmentShopCallerButtonListener());		
 	SetListenerWidget("Equip_ArmorEquipmentTab",  ZEquipItemEquipmentTabOpen());
 	SetListenerWidget("Equip_WeaponEquipmentTab",  ZEquipWeaponEquipmentTabOpen());	
 	SetListenerWidget("Equip_EquipListFrameOpenButton",  ZEquipListFrameOpen());
@@ -890,6 +890,7 @@ bool ZGameInterface::InitInterfaceListener()
 
 	SetListenerWidget("BringAccountItemBtn", ZGetBringAccountItemButtonListener());
 	SetListenerWidget("SendAccountItemBtn", ZGetSendAccountItemButtonListener());
+	SetListenerWidget("Equipment_to_Shop", ZGetEquipmentShopCallerButtonListener());
 
 	// A����?AI ����AA ��I����
 	SetListenerWidget("CS_SelectChar", ZGetSelectCharacterButtonListener());
@@ -897,7 +898,7 @@ bool ZGameInterface::InitInterfaceListener()
 	SetListenerWidget("CS_CreateChar", ZGetShowCreateCharacterButtonListener());
 	SetListenerWidget("CS_DeleteChar", ZGetDeleteCharacterButtonListener());
 	SetListenerWidget("CS_Prev", ZGetLogoutListener());
-	SetListenerWidget("CharSel_SelectBtn0", ZGetSelectCharacterButtonListener0());
+	SetListenerWidget("CharSel_SelectBtn0", ZGetSelectCharacterButtonListener0()); // TODO figure out adding a new character slot
 	SetListenerWidget("CharSel_SelectBtn1", ZGetSelectCharacterButtonListener1());
 	SetListenerWidget("CharSel_SelectBtn2", ZGetSelectCharacterButtonListener2());
 	SetListenerWidget("CharSel_SelectBtn3", ZGetSelectCharacterButtonListener3());
@@ -2310,6 +2311,8 @@ bool ZGameInterface::OnCreate(ZLoadingProgress *pLoadingProgress)
 	if (!m_sbRemainClientConnectionForResetApp)
 		m_spGameClient = new ZGameClient();
 
+
+
 	if(!m_Tips.Initialize(ZApplication::GetFileSystem(), ZGetLocale()->GetLanguage())) {
 		mlog("Check tips.xml\n");
 		return false;
@@ -2831,7 +2834,7 @@ bool ZGameInterface::OnCreate(ZLoadingProgress *pLoadingProgress)
 	SetCursorEnable(true);
 
 	mlog( "game interface create success.\n" );
-
+	InitGunZConsole();
 	return true;
 }
 
@@ -5396,7 +5399,7 @@ void ZGameInterface::ShowShopDialog(bool bShow)
 
 
 		MTextArea* pTextArea = (MTextArea*)ZApplication::GetGameInterface()->GetIDLResource()->FindWidget("Shop_ItemDescription");
-		if(pTextArea)	pTextArea->SetText("");
+		if(pTextArea)	pTextArea->SetText("test");
 
 		//pPicture = (MPicture*)ZApplication::GetGameInterface()->GetIDLResource()->FindWidget("Shop_ItemIcon");
 		//pPicture->SetBitmap( NULL);
@@ -5404,12 +5407,13 @@ void ZGameInterface::ShowShopDialog(bool bShow)
 		MLabel* pLabel = (MLabel*)pResource->FindWidget("Shop_Message");
 		if ( pButton && pLabel)
 		{
-		char buf[256];
-		if ( ZApplication::GetGameInterface()->GetState() == GUNZ_STAGE)
+			char buf[256];
+			if ( ZApplication::GetGameInterface()->GetState() == GUNZ_STAGE)
 			{
-		pButton->Show( true);
-		sprintf( buf, "%s > %s > %s", ZGetGameClient()->GetServerName(), ZMsg( MSG_WORD_STAGE), ZMsg( MSG_WORD_SHOP));
-		pLabel->SetText( buf);
+				pButton->Show( true);
+				sprintf( buf, "%s > %s > %s", ZGetGameClient()->GetServerName(), ZMsg( MSG_WORD_STAGE), ZMsg( MSG_WORD_SHOP));
+				pLabel->SetText( buf);
+				//Add Mlog info
 			}
 			else
 			{
@@ -5418,7 +5422,6 @@ void ZGameInterface::ShowShopDialog(bool bShow)
 				pLabel->SetText( buf);
 			}
 		}
-
 
 		MWidget* pWidget = pResource->FindWidget("Shop");
 		if(pWidget!=NULL)

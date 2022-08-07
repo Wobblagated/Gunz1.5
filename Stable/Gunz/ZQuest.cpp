@@ -339,7 +339,7 @@ bool ZQuest::OnNPCSpawn(MCommand* pCommand)
 		pNewActor->SetDirection(NPCDir);
 		bool bMyControl = (uidChar == ZGetGameClient()->GetPlayerUID());
 		pNewActor->SetMyControl(bMyControl);
-		
+
 		ZCharacter *pOwner = (ZCharacter*) ZGetCharacterManager()->Find(uidChar);
 		if(pOwner)
 			pNewActor->SetOwner(pOwner->GetCharName());

@@ -19,6 +19,7 @@ protected:
 	bool PopTask();
 	bool CancelCurrTask();
 	void CompleteCurrTask();
+
 public:
 	ZTaskManager();
 	~ZTaskManager();

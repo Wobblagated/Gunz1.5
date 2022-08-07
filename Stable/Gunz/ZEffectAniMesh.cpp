@@ -520,8 +520,14 @@ bool ZEffectBerserkerIconLoop::Draw(unsigned long int nTime)
 		if(!pChar->IsRendered()) return true;
 
 		if( pChar->m_pVMesh ) {
-			m_Pos = pObj->m_pVMesh->GetBipTypePosition(m_type);
-			m_DirOrg = -pChar->m_Direction;
+			rmatrix m = pObj->GetVisualMesh()->GetBipTypeRMatrix(m_type);
+			//m_Pos = pObj->m_pVMesh->GetBipTypePosition(m_type);		
+			//m_DirOrg = -pChar->m_Direction;
+			
+			m_Pos = rvector(m._41, m._42, m._43);
+			m_DirOrg = rvector(m._21, m._22, m._23);
+			m_Up = rvector(m._11, m._12, m._13);
+
 			ZEffectAniMesh::Draw(nTime);
 			return true;
 		}

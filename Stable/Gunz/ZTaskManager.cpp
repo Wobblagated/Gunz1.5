@@ -101,7 +101,6 @@ void ZTaskManager::Run(float fDelta)
 		{
 		case ZTR_RUNNING:
 			{
-
 			}
 			break;
 		case ZTR_COMPLETED:
@@ -180,7 +179,6 @@ void ZTaskManager::CompleteCurrTask()
 	{
 		m_pOnFinishedFunc(m_pCurrTask->GetParent(), m_pCurrTask->GetID());
 	}
-
 	delete m_pCurrTask;
 	m_pCurrTask = NULL;
 }

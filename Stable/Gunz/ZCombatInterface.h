@@ -177,6 +177,8 @@ protected:
 	int					m_damageDealt;
 public:
 	void DrawHPAPNumbers(MDrawContext* pDC);
+	void DrawNPCGauges(MDrawContext* pDC);
+	void DrawTeamGauges(MDrawContext* pDC);
 protected:
 	void DrawFriendName(MDrawContext* pDC);			// 같은편 이름
 	void DrawEnemyName(MDrawContext* pDC);			// 적 이름

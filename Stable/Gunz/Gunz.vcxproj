@@ -210,6 +210,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="GunZConsole.h" />
     <ClInclude Include="ZActionDef.h" />
     <ClInclude Include="ZActorAction.h" />
     <ClInclude Include="ZActorActionManager.h" />
@@ -482,6 +483,7 @@
     <ClInclude Include="ZWorldObject_Navigation.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GunZConsole.cpp" />
     <ClCompile Include="ZActorAction.cpp" />
     <ClCompile Include="ZActorActionManager.cpp" />
     <ClCompile Include="ZActorBase.cpp" />

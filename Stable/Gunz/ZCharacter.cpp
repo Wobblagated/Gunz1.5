@@ -1416,6 +1416,7 @@ void ZCharacter::UpdateSpeed()
 	{
 		if( GetItems()->GetSelectedWeapon()->GetDesc()->m_nType.Ref()==MMIT_MELEE) 
 		{
+
 			// 첫번째 공격은 비율을 계산한다..
 /*
 			if(m_AniState_Lower == ZC_STATE_LOWER_ATTACK1) {
@@ -1481,7 +1482,12 @@ void ZCharacter::UpdateSpeed()
 //				(m_AniState_Lower == ZC_STATE_LOWER_UPPERCUT) ) {
 
 				MMatchItemDesc* pRangeDesc = GetItems()->GetSelectedWeapon()->GetDesc();
-
+				//Add Rarity Print
+				if (pRangeDesc->m_nRarity.Ref() == MMIR_CELESTIAL)
+				{
+					mlog("Celestial");
+				}
+				
 //				DWORD nWeaponDelay = (DWORD)((float)pRangeDesc->m_nDelay * 0.7f);// 반으로 나눠서~
 				int  nWeaponDelay = GetSelectWeaponDelay( pRangeDesc );
 

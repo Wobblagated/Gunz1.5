@@ -921,6 +921,7 @@
     <ClInclude Include="ZWorldObject_Navigation.h">
       <Filter>WorldObjects</Filter>
     </ClInclude>
+    <ClInclude Include="GunZConsole.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ZBandiCapturer.cpp">
@@ -1667,6 +1668,7 @@
     <ClCompile Include="ZWorldObject_Navigation.cpp">
       <Filter>WorldObjects</Filter>
     </ClCompile>
+    <ClCompile Include="GunZConsole.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="runtime\shader\skin.vsh">

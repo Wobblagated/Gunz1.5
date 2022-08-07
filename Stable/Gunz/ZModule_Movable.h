@@ -68,6 +68,7 @@ public:
 	bool Move(rvector &diff);
 
 	void UpdateGravity(float fDelta);
+	void UpdateGravity(ZObject* pObj, float fDelta);
 
 	float GetDistToFloor() { return m_fDistToFloor.Ref(); }
 

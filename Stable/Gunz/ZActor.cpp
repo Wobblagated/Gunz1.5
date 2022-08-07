@@ -427,6 +427,7 @@ void ZActor::UpdateHeight(float fDelta)
 	bool bJumpUp=(GetVelocity().z>0.0f);
 	bool bJumpDown = false;
 
+
 	if(m_pModule_Movable->isLanding())
 	{
 		SetFlag(AF_LAND, true);
@@ -529,6 +530,7 @@ void ZActor::UpdatePosition(float fDelta)
 	}
 
 	m_pModule_Movable->Update(fDelta);
+	
 
 }
 
@@ -1187,7 +1189,12 @@ void ZActor::OnTaskFinishedCallback(ZActor* pActor, ZTASK_ID nLastID)
 
 void ZActor::OnTaskFinished(ZTASK_ID nLastID)
 {
-	if (m_pBrain) m_pBrain->OnBody_OnTaskFinished(nLastID);
+	if (m_pBrain) 
+	{
+		m_pBrain->OnBody_OnTaskFinished(nLastID);
+		m_pBrain->SetCurrentSkill(NULL);
+	}
+		
 }
 
 

@@ -79,6 +79,8 @@ public:
 	void SetAnimationSpeed(int nKillsDiff);
 };
 
+//Custom
+class MDrawContext;
 
 
 class ZScreenEffectManager : public ZEffectList {
@@ -143,6 +145,7 @@ private:
 	RBaseTexture	*m_pGaugeTexture;
 
 	void DrawGauges();
+	//void DrawNPCGauges(MDrawContext* pDC);
 	void DrawInfectionGauges();
 
 	float m_fGaugeHP,m_fGaugeAP,m_fGaugeEXP;
@@ -175,7 +178,7 @@ protected:
 	void DrawCombo();
 	void PlaySoundScoreFlyby();
 	void PlaySoundScoreGet();
-	void DrawQuestEffects();
+	void DrawQuestEffects(MDrawContext* pDC);
 	void DrawDuelEffects();
 	void DrawTDMEffects();
 	void DrawArrow(rvector& vTargetPos);
@@ -194,14 +197,17 @@ public:
 	int GetCount() { return (int)size();}
 
 	void Clear();
-
-	void Draw();
+	
+	void Draw(MDrawContext* pDC);
 	void DrawScoreBoard();
 	void DrawSpectator();
 	void DrawMyHPPanal(MDrawContext* pDC);
 	void DrawInfectionPanel(MDrawContext* pDC);
 	void DrawMyWeaponImage();
 	void DrawMyBuffImage();
+	// Custom
+	void DrawBossHP(MDrawContext* pDC);
+	//char* enum_to_string(MMatchItemRarity type);
 
 	void ResetSpectator();
 

@@ -223,6 +223,7 @@ void ZBrain::ProcessAttack( float fDelta)
 
 			ZTask* pNew = ZTaskManager::CreateSkill( m_pBody, nSkill, uidTarget, targetPosition);
 			m_pBody->GetTaskManager()->Push( pNew);
+			currentSkill = pSkill;
 		}
 	}
 }
@@ -246,14 +247,14 @@ bool ZBrain::GetUseableSkill( int *pnSkill, MUID *puidTarget, rvector *pTargetPo
 	// Check skills
 	for ( int i = 0;  i < pmod->GetSkillCount();  i++)
 	{
-		ZSkill *pSkill = pmod->GetSkill( i);
+		pSkill = pmod->GetSkill( i);
 
 		// Check cool time
 		if ( !pSkill->IsReady())
 			continue;
 
 		// Get skill description
-		ZSkillDesc *pDesc = pmod->GetSkill( i)->GetDesc();
+		pDesc = pmod->GetSkill( i)->GetDesc();
 
 
 		// 스킬의 적용 대상이 아군인 경우...

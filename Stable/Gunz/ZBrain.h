@@ -42,8 +42,9 @@ protected:
 	DWORD				m_dwExPositionTime;	///< 예전 위치 기억한 시각
 	rvector				m_exPositionForWarp;		///< 몸체의 예전 위치
 	DWORD				m_dwExPositionTimeForWarp;	///< 예전 위치 기억한 시각
-	
-
+	ZSkill*				pSkill;
+	ZSkillDesc*			pDesc;
+	ZSkill*				currentSkill = NULL;
 	// 길찾기 관련
 	list<rvector>		m_WayPointList;
 
@@ -62,7 +63,6 @@ protected:
 	bool GetUseableSkill( int *pnSkill, MUID *pTarget, rvector *pTargetPosition);
 	void ProcessBuildPath( float fDelta);
 
-
 public:
 	// 몸체에서의 이벤트 발생 인터페이스
 	void OnBody_AnimEnter( ZA_ANIM_STATE nAnimState);
@@ -79,9 +79,11 @@ public:
 	void Think( float fDelta);
 	void OnDamaged();
 
-	ZActor* GetBody()					{ return m_pBody; }
-	ZObject* GetTarget();
 
+	ZActor* GetBody()						{ return m_pBody; }
+	ZObject* GetTarget();
+	ZSkill* GetCurrentSkill()				{ return currentSkill; }
+	ZSkill* SetCurrentSkill(ZSkill* skill)	{ return currentSkill = skill; }
 };
 
 

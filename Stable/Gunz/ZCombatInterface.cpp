@@ -829,7 +829,7 @@ void ZCombatInterface::OnDraw(MDrawContext* pDC)
 	GetVoteInterface()->DrawVoteMessage(pDC);
 
 	// 퀘스트시 보스게이지, 콤보 에니메이션, K.O 이미지
-	ZGetScreenEffectManager()->Draw();
+	ZGetScreenEffectManager()->Draw(pDC);
 
 	if(IsShowUI())				// 모든 UI 감추기... by kam 20081020
 	{

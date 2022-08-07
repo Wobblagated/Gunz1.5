@@ -33,6 +33,7 @@ public:
 	virtual rmatrix GetCurrentWeaponPositionMatrix( bool right=false ) { return m_pVMesh->GetCurrentWeaponPositionMatrix(right); }
 	virtual rvector GetCurrentWeaponPosition( bool right=false ) { return m_pVMesh->GetCurrentWeaponPosition(right); }
 	virtual rvector GetBipTypePosition(RMeshPartsPosInfoType type) { return m_pVMesh->GetBipTypePosition(type); }
+	virtual rmatrix GetBipTypeRMatrix(RMeshPartsPosInfoType type) { return m_pVMesh->GetBipTypeRMatrix(type); }
 
 	virtual rvector GetFootPosition() { return m_pVMesh->GetFootPosition(); }
 

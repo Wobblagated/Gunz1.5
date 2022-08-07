@@ -138,8 +138,29 @@ bool ZModule_Movable::Move(rvector &diff)
 
 void ZModule_Movable::UpdateGravity(float fDelta)
 {
+	//if (MIsDerivedFromClass(ZActor, pThisObj))
+	//{
+
+//	}
 	m_Velocity.z = 
 		max( m_Velocity.z - GRAVITY_CONSTANT*fDelta,-MAX_FALL_SPEED);
+}
+
+void ZModule_Movable::UpdateGravity(ZObject* pObj, float fDelta)
+{
+	//if (MIsDerivedFromClass(ZActor, pThisObj))
+	//{
+
+//	}
+	if (pObj)
+	{
+		ZObject* pThisObj = MStaticCast(ZObject, m_pContainer);
+		m_Velocity.z =
+			max(m_Velocity.z - 500.f * fDelta, -MAX_FALL_SPEED);
+		pThisObj->SetVelocity(m_Velocity);
+		mlog("Obj name: %s", pThisObj->GetVisualMesh()->GetMesh()->GetName());
+	}
+	
 }
 
 void ZModule_Movable::UpdatePosition(float fDelta)

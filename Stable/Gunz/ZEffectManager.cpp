@@ -649,7 +649,8 @@ int ZEffectManager::DeleteSameType(ZEffectAniMesh* pNew)
 
 #ifndef _PUBLISH
 				g_EffectValidator.Erase(pEffect);
-#endif
+#endif			
+				(ZEffectAniMesh*)pEffect)->GetUID();
 				delete pEffect;
 				node = m_Effects[d].erase( node );
 				cnt++;
@@ -2951,14 +2952,15 @@ void ZEffectManager::AddBerserkerIcon(ZObject* pObj)
 		Add(pNew);
 	}
 }
-
+//TODO -figure out why flag disappears when charging a massive
 void ZEffectManager::AddFlagEffect(ZObject* pObj)
 {
 	int index = 1;
 	if (pObj->GetTeamID() == MMT_RED)
 		index = 0;
 	ZEffect* pNew = new ZEffectBerserkerIconLoop(m_pFlagEffect[index], pObj);
-	((ZEffectBerserkerIconLoop*)pNew)->SetAlignType(1);
+
+	((ZEffectBerserkerIconLoop*)pNew)->SetAlignType(0);
 	((ZEffectBerserkerIconLoop*)pNew)->m_type = eq_parts_pos_info_Spine1;
 
 	Add(pNew);
@@ -3072,7 +3074,7 @@ void ZEffectManager::AddChargedEffect( ZObject *pObj )
 	rvector TargetNormal = rvector(1,0,0);
 	ZEffectCharged *pNew = new ZEffectCharged(m_pEffectMeshMgr->Get("ef_spirits.elu_1.elu"),pObj->GetPosition(),TargetNormal,pObj);
 	((ZEffectCharged*)pNew)->SetAlignType(1);
-	DeleteSameType((ZEffectAniMesh*)pNew);
+	//DeleteSameType((ZEffectAniMesh*)pNew);
 	Add(pNew);
 }
 

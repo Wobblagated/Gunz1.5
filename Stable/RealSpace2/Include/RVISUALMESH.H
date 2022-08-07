@@ -336,6 +336,7 @@ public:
 	// 한번은 그려지고 난 다음에 의미를 갖는다.
 
 	void GetBipTypeMatrix(rmatrix *mat,RMeshPartsPosInfoType type);
+	rmatrix GetBipTypeRMatrix(RMeshPartsPosInfoType type);
 
 	void GetHeadMatrix(rmatrix *mat);
 	void GetRFootMatrix(rmatrix *mat);

@@ -305,6 +305,16 @@ struct MMatchAvatarMeshName
 	char m_szFeetMeshName[128];	
 };
 
+enum MMatchItemRarity
+{
+	MMIR_COMMON = 0,
+	MMIR_RARE = 1,
+	MMIR_LEGENDARY = 2,
+	MMIR_FABLED = 3,
+	MMIR_MYTHICAL = 4,
+	MMIR_CELESTIAL = 5
+};
+
 struct MMatchItemDesc
 {
 	unsigned long int		m_nID;
@@ -395,6 +405,10 @@ struct MMatchItemDesc
 
 	void DumpBinary(FILE* fp);
 	void LoadBinary(FILE* fp);
+	// CUSTOM - PVE VALUES
+	MProtectValue<MMatchItemRarity> m_nRarity;
+
+
 };
 
 
@@ -635,6 +649,13 @@ public:
 	bool IsEmpty() const { return empty(); }
 	int GetCount() const { return (int)size(); }
 	virtual bool CreateItem( const MUID& uid
+		, int nCIID
+		, int nItemDescID
+		, bool bRentItem = false
+		, DWORD dwRentMinutePeriodRemainder = RENT_MINUTE_PERIOD_UNLIMITED
+		, const WORD wRentHourPeriod = RENT_PERIOD_UNLIMITED
+		, int nCount = 1);
+	virtual bool CreateItemRandom(const MUID& uid
 		, int nCIID
 		, int nItemDescID
 		, bool bRentItem = false

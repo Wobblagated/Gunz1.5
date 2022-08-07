@@ -2522,6 +2522,21 @@ void RVisualMesh::GetBipTypeMatrix(rmatrix *mat,RMeshPartsPosInfoType type)
 	}
 }
 
+rmatrix RVisualMesh::GetBipTypeRMatrix(RMeshPartsPosInfoType type)
+{
+	rmatrix mat;
+	if (m_pBipMatrix)
+	{
+		if (m_isScale) {
+			mat = m_pBipMatrix[type] * m_ScaleMat * m_WorldMat;
+		}
+		else {
+			mat = m_pBipMatrix[type] * m_WorldMat;
+		}
+	}
+	return mat;
+}
+
 void RVisualMesh::GetRFootMatrix(rmatrix *mat) { GetBipTypeMatrix(mat,eq_parts_pos_info_RFoot); }
 void RVisualMesh::GetLFootMatrix(rmatrix *mat) { GetBipTypeMatrix(mat,eq_parts_pos_info_LFoot); }
 void RVisualMesh::GetHeadMatrix(rmatrix *mat)  { GetBipTypeMatrix(mat,eq_parts_pos_info_Head);  }

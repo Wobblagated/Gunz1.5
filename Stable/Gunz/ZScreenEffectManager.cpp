@@ -13,6 +13,8 @@
 #include "ZConfiguration.h"
 #include "ZActor.h"
 #include "ZRuleQuestChallenge.h"
+#include "GunZConsole.h"
+
 void DrawGauge(float x,float y,float fWidth,float fHeight,float fLeanDir,DWORD color);
 
 ZScreenEffect::ZScreenEffect(RMesh *pMesh,rvector offset)
@@ -203,6 +205,7 @@ void ZBossGaugeEffect::Shock(float fPower)
 	m_fShockPower = min((max(20.0f, 20.0f + fPower)), 70.0f);
 }
 
+// Position Boss Health Bar to the Right side of the screen
 bool ZBossGaugeEffect::Draw(unsigned long int nTime)
 {
 	MUID uidBoss = MUID(0, 0);
@@ -272,6 +275,7 @@ bool ZBossGaugeEffect::Draw(unsigned long int nTime)
 
 		if (m_nVisualValue > 0)
 		{
+
 			const int width = 433+1;
 			const int height = 12;
 
@@ -287,7 +291,6 @@ bool ZBossGaugeEffect::Draw(unsigned long int nTime)
 
 			float fx = 183.0f / 800.0f + offset.x / 980.0f;
 			float fy = 574.0f / 600.0f - offset.y / 720.0f;
-
 			DrawGauge(fx, fy, fGaugeWidth / 800.0f, 7.0f / 600.0f, 0.0f, color);
 		}
 	}
@@ -1017,7 +1020,12 @@ void ZScreenEffectManager::DrawGauges()
 
 }
 
-void ZScreenEffectManager::Draw()
+
+
+
+
+
+void ZScreenEffectManager::Draw(MDrawContext* pDC)
 {
 	ZCharacter *pTargetCharacter = ZGetGameInterface()->GetCombatInterface()->GetTargetCharacter();
 	if (!pTargetCharacter || !pTargetCharacter->GetInitialized()) return;
@@ -1086,7 +1094,7 @@ void ZScreenEffectManager::Draw()
 
 	if (ZGetCombatInterface()->IsShowUI())
 	{
-		DrawQuestEffects(); // 퀘스트시 K.O 이미지
+		DrawQuestEffects(pDC); // 퀘스트시 K.O 이미지
 		DrawDuelEffects();
 		DrawTDMEffects();
 	}
@@ -1110,8 +1118,10 @@ void ZCombatInterface::DrawHPAPNumbers(MDrawContext* pDC)
 		pDC->SetFont(pFont);
 		pDC->SetColor(MCOLOR(0xFC3CB333));
 
-		sprintf(hp, "HP : %d/%d", (int)pCharacter->GetHP(), (int)pCharacter->GetMaxHP());
+		sprintf(hp, "HP : %d", (int)pCharacter->GetHP());
 		TextRelative(pDC, 100.f / 800.f, 23.f / 600.f, hp);
+		//const char* rarity_name[] = { "MMIR_COMMON", "MMIR_RARE", "MMIR_LEGENDARY", "MMIR_FABLED", "MMIR_MYTHICAL", "MMIR_CELESTIAL" };
+		//pCharacter->GetItems()->GetSelectedWeapon()->GetDesc()->m_nRarity
 	}
 
 	{ZCharacter* pCharacter = GetTargetCharacter();
@@ -1128,15 +1138,149 @@ void ZCombatInterface::DrawHPAPNumbers(MDrawContext* pDC)
 		pDC->SetFont(pFont);
 		pDC->SetColorAP(MCOLOR(0xFCCC0000));
 
-		sprintf(ap, "AP : %d/%d ", (int)pCharacter->GetAP(), (int)pCharacter->GetMaxAP());
+		sprintf(ap, "AP : %d", (int)pCharacter->GetAP());
 		TextRelative(pDC, 100.f / 800.f, 50.f / 600.f, ap);
 	}}
-
 }
 
+/*char* ZScreenEffectManager::enum_to_string(MMatchItemRarity type) {
+	switch (type) {
+	case MMIR_COMMON:
+		return "Tiger";
+	case MMIR_RARE:
+		return "Elephant";
+	case MMIR_LEGENDARY:
+		return "Bat";
+	case MMIR_FABLED:
+		return "Dog";
+	case MMIR_MYTHICAL:
+		return "Cat";
+	case MMIR_CELESTIAL:
+		return "Mouse";
+	default:
+		return "Invalid ";
+	}
+}*/
 
 
+//TODO -- Position Health % to Boss Health Bar Correctly
+void ZScreenEffectManager::DrawBossHP(MDrawContext* pDC)
+{
+	if (!ZGetGame()->GetMatch()->IsQuestDrived()) return;
 
+	MUID uidBoss = MUID(0, 0);
+	if (ZGetGame()->GetMatch()->IsQuestDrived())
+	{
+		uidBoss = ZGetQuest()->GetGameInfo()->GetBoss();
+	}
+	else if (ZGetGame()->GetMatch()->GetMatchType() == MMATCH_GAMETYPE_QUEST_CHALLENGE)
+	{
+		uidBoss = ((ZRuleQuestChallenge*)ZGetGame()->GetMatch()->GetRule())->GetBoss();
+	}
+	ZObject* pBoss = ZGetObjectManager()->GetObject(uidBoss);
+	if ((pBoss) && (pBoss->IsNPC()) && (!pBoss->IsDie()))
+	{
+		ZActorBase* pBossActor = (ZActorBase*)pBoss;
+		int nMax = pBossActor->GetActualMaxHP()/* + pBossActor->GetActualMaxAP()*/;
+		int nCurr = min(pBossActor->GetActualHP()/* + pBossActor->GetAP()*/, nMax);
+		float nPerc = (((float)pBossActor->GetActualHP() / (float)pBossActor->GetActualMaxHP()) * 100);
+		char buffer[256];
+		MFont* pFont = MFontManager::Get("FONTa10_O2Wht");
+		pDC->SetFont(pFont);
+		pDC->SetColor(MCOLOR(0xFC3CB333));
+		sprintf(buffer, " %.1f%%", nPerc);
+		//sprintf(buffer, "%d  %s", pCharacter->GetProperty()->nLevel, pCharacter->GetProperty()->GetName());
+		//OutputDebugString(hp); ((pBossActor->GetActualHP() /pBossActor->GetActualMaxHP())*100)
+		//ZChatOutput(buffer);
+		TextRelative(pDC, 330.f / 800.f, 480.f / 600.f, buffer);
+	}
+}
+
+//TODO Find a way to check if NPC is in view of camera
+void ZCombatInterface::DrawNPCGauges(MDrawContext* pDC)
+{
+	/*
+	if (ZGetGame()->GetMatch()->GetMatchType() == MMATCH_GAMETYPE_QUEST ||
+		ZGetGame()->GetMatch()->GetMatchType() == MMATCH_GAMETYPE_QUEST_CHALLENGE) {
+		if (ZGetConfiguration()->GetVideo()->bHPAP) {
+
+		}
+	}*/
+	if (!ZGetGame()->GetMatch()->IsQuestDrived()) return;
+
+	for (ZObjectManager::iterator itor = ZGetObjectManager()->begin();
+		itor != ZGetObjectManager()->end(); ++itor)
+	{
+		rvector pos, screen_pos;
+		ZObject* pObject = (*itor).second;
+		if (!pObject->IsVisible()) continue;
+		if (pObject->IsDie()) continue;
+		if (!pObject->IsNPC()) continue;
+
+		ZActor* pActor = (ZActor*)pObject;
+		ZBrain* pActorBrain = pActor->GetBrain();
+		ZCharacter* pCharacter = GetTargetCharacter();
+		ZCamera* pCamera = ZGetGameInterface()->GetCamera();
+
+		pos = pObject->GetPosition();
+		RealSpace2::rboundingbox box;
+
+		if (pObject->m_pVMesh == NULL) continue;
+		
+		box.vmax = pos + rvector(50.f, 50.f, 190.f);
+		box.vmin = pos + rvector(-50.f, -50.f, 0.f);
+
+		if (!ZGetGame()->IsWallBlocked(pCharacter, pActor, true) && isInViewFrustum(&box, RGetViewFrustum()))
+		{
+			screen_pos = RGetTransformCoord(pActor->GetVisualMesh()->GetHeadPosition() + rvector(0, 0, 100.f));
+			int x = screen_pos.x - pDC->GetFont()->GetWidth(pActor->m_szOwner) / 2;
+			MFont* pFont = pFont = MFontManager::Get("FONTa10");
+			MCOLOR color = MCOLOR(0xFFFFFFFF); // White
+			//pFont = pActor->IsMyControl() ? MFontManager::Get("FONTa12_O1Blr") : MFontManager::Get("FONTa12_O1Red");
+			pDC->SetColor(color);
+			pDC->SetBitmap(NULL);
+			pDC->SetFont(pFont);
+			//Draw NPC Health Text
+			char szText[128];		
+			sprintf(szText, "%d", pActor->GetActualHP());
+			pDC->Text(x, screen_pos.y, szText);
+			//Draw NPC Name
+			sprintf(szText,"%s", pActor->GetNPCInfo()->szName);
+			pDC->Text(x, screen_pos.y - 12, szText);
+			//Draw NPC Health Bar
+			const int BAR_HEIGHT = 4;
+			const int BAR_WIDTH = 80;
+			int bar_hp_width = (int)(BAR_WIDTH * ((float)pActor->GetActualHP() / pActor->GetActualMaxHP()));
+			int bar_ap_width = (int)(BAR_WIDTH * ((float)pActor->GetActualHP() / pActor->GetActualMaxHP()));
+			pDC->FillRectangle(x, screen_pos.y - 24, bar_hp_width, BAR_HEIGHT);
+			pDC->SetColor(MCOLOR(0xFF000000)); // Black
+			pDC->Rectangle(x, screen_pos.y - 24, BAR_WIDTH, BAR_HEIGHT);
+			//Draw NPC Skill Bar
+			if (pActorBrain->GetCurrentSkill() != NULL) 
+			{			
+				if (pActor->GetCurrAni() == ZA_ANIM_DONE) return;
+					pDC->SetColor(color);
+					float currentCastTime = (float)(pActor->GetVisualMesh()->GetFrameInfo(ani_mode_lower)->m_nFrame / 1000);
+					float maxCastTime = (float)(pActor->GetVisualMesh()->GetMaxFrame(ani_mode_lower) / 1000);
+					int barSkillTimeWidth = (int)(BAR_WIDTH * currentCastTime / maxCastTime);
+					if (currentCastTime / maxCastTime > 1)
+					{
+						barSkillTimeWidth = BAR_WIDTH;
+					}
+					//char test[128];
+					//sprintf(test, "%f", currCastTime);
+				//	ZChatOutput(test);
+					sprintf(szText, "%s", pActorBrain->GetCurrentSkill()->GetDesc()->szName);
+					pDC->Text(x, screen_pos.y - 36, szText);
+					pDC->FillRectangle(x, screen_pos.y - 48, barSkillTimeWidth, BAR_HEIGHT);
+					pDC->SetColor(MCOLOR(0xFF000000)); // Black
+					pDC->Rectangle(x, screen_pos.y - 48, BAR_WIDTH, BAR_HEIGHT);
+			}	
+		}
+	}
+}
+
+	
 void ZScreenEffectManager::DrawMyWeaponImage()
 {
 	if (ZGetGameInterface()->GetCombatInterface()->GetObserverMode()) return;
@@ -1691,7 +1835,7 @@ void ZScreenEffectManager::DestroyQuestRes()
 }
 
 
-void ZScreenEffectManager::DrawQuestEffects()
+void ZScreenEffectManager::DrawQuestEffects(MDrawContext* pDC)
 {
 	bool isQuestDerived = ZGetGameTypeManager()->IsQuestDerived(ZGetGameClient()->GetMatchStageSetting()->GetGameType());
 	bool isNewQuestDerived = ZGetGameTypeManager()->IsNewQuestDerived(ZGetGameClient()->GetMatchStageSetting()->GetGameType());
@@ -1701,7 +1845,15 @@ void ZScreenEffectManager::DrawQuestEffects()
 
 	if (m_pBossHPPanel)
 	{
-		if(ZGetCombatInterface()->IsShowUI())
+		if (ZGetCombatInterface()->IsShowUI())
+			/*
+			// find how to get boss HP
+			char sz[256] = "";
+			sprintf(sz, %d, ZStr(std::string("UI_OPTION_20")));
+			ZChatOutput(MCOLOR(ZCOLOR_CHAT_SYSTEM), sz); // add to quest interface drawing
+			*/
+			DrawBossHP(pDC);
+			ZGetCombatInterface()->DrawNPCGauges(pDC);
 			m_pBossHPPanel->Draw(0);
 	}
 

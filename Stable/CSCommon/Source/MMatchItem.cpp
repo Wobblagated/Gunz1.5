@@ -80,6 +80,10 @@ MMatchItemDesc::MMatchItemDesc() : m_nID(0), m_nSlot(MMIST_NONE), m_pEffect(NULL
 	m_pAvatarMeshName = new MProtectValue<MMatchAvatarMeshName>;
 	memset(&m_pAvatarMeshName->Ref(), 0, sizeof(MMatchAvatarMeshName));
 	m_pAvatarMeshName->MakeCrc();
+
+	// CUSTOM - PVE
+	m_nRarity.Set_MakeCrc(MMIR_COMMON);
+
 }
 
 MMatchItemDesc::~MMatchItemDesc()
@@ -116,6 +120,10 @@ void MMatchItemDesc::CacheCRC32( MMatchCRC32XORCache& crc )
 	crc.CRC32XOR( m_nDamageType.Ref() );
 	crc.CRC32XOR( m_nDamageTime.Ref() );
 	crc.CRC32XOR( m_nLifeTime.Ref() );
+
+	//CUSTOM - PVE
+	crc.CRC32XOR(m_nRarity.Ref());
+
 
 	// 메쉬명을 바꾸는 메모리핵 때문에 메쉬명도 crc에 포함 (따발공속으로 칼질함)
 	const char* szMeshName;
@@ -200,6 +208,9 @@ void MMatchItemDesc::ShiftFugitiveValues()
 	m_nDamageType.ShiftHeapPos_CheckCrc();
 	m_nDamageTime.ShiftHeapPos_CheckCrc();
 	m_nLifeTime.ShiftHeapPos_CheckCrc();
+
+	// CUSTOM - PVE
+	m_nRarity.ShiftHeapPos_CheckCrc();
 }
 
 void MMatchItemDesc::DumpBinary(FILE* fp)
@@ -502,6 +513,7 @@ bool MMatchItemDescMgr::ParseItem(MXmlElement& element)
 	pNewDesc->m_nColor = 0xFFFFFFFF;
 	pNewDesc->m_nAngle.Set_MakeCrc(120);
 	pNewDesc->m_nMaxRentPeriod.Set_MakeCrc(RENT_PERIOD_UNLIMITED);
+	pNewDesc->m_nRarity.Set_MakeCrc(MMIR_COMMON);
 
 	int n = 0;
 	char szAttrValue[256];
@@ -919,6 +931,17 @@ bool MMatchItemDescMgr::ParseItem(MXmlElement& element)
 		{
 			strcpy_s(pNewDesc->m_szElu, szAttrValue);
 		}
+		else if (!_stricmp(szAttrName, "item_rarity"))
+		{
+			if (strlen(szAttrValue) <= 0)						pNewDesc->m_nRarity.Set(MMIR_COMMON);
+			else if (!_stricmp(szAttrValue, "common"))			pNewDesc->m_nRarity.Set(MMIR_COMMON);
+			else if (!_stricmp(szAttrValue, "rare"))			pNewDesc->m_nRarity.Set(MMIR_RARE);
+			else if (!_stricmp(szAttrValue, "legendary"))		pNewDesc->m_nRarity.Set(MMIR_LEGENDARY);
+			else if (!_stricmp(szAttrValue, "fabled"))			pNewDesc->m_nRarity.Set(MMIR_FABLED);
+			else if (!_stricmp(szAttrValue, "mythical"))		pNewDesc->m_nRarity.Set(MMIR_MYTHICAL);
+			else if (!_stricmp(szAttrValue, "celestial"))		pNewDesc->m_nRarity.Set(MMIR_CELESTIAL);
+
+		}
 	}
 
 	if( pNewDesc->IsSpendableItem() && pNewDesc->m_nSpendType.Ref() == MMCT_NONE ) {
@@ -1125,7 +1148,62 @@ bool MMatchItemMap::CreateItem( const MUID& uid
 	pNewItem->SetRentItemRegTime( MMatchServer::GetInstance()->GetTickTime() );
 	pNewItem->SetRentHourPeriod( wRentHourPeriod );
 	pNewItem->SetItemCount(nCount);
-	
+
+	insert(value_type(uid, pNewItem));
+
+	if (bRentItem) m_bHasRentItem = true;
+
+	return true;
+}
+
+bool MMatchItemMap::CreateItemRandom(const MUID& uid
+	, int nCIID
+	, int nItemDescID
+	, bool bRentItem
+	, DWORD dwRentMinutePeriodRemainder
+	, const WORD wRentHourPeriod
+	, int nCount)
+{
+	MMatchItemDesc* pDesc = NULL;
+	pDesc = MGetMatchItemDescMgr()->GetItemDesc(nItemDescID);
+
+	if (pDesc == NULL) {
+		_ASSERT(0);
+		return false;
+	}
+
+	MMatchItem* pNewItem = new MMatchItem();
+	if (pNewItem == NULL) {
+		_ASSERT(0);
+		return false;
+	}
+
+	pNewItem->Create(uid, pDesc, pDesc->m_nMagazine.Ref());
+	pNewItem->SetCIID(nCIID);
+	pNewItem->SetRentItem(dwRentMinutePeriodRemainder);
+	pNewItem->SetRentItemRegTime(MMatchServer::GetInstance()->GetTickTime());
+	pNewItem->SetRentHourPeriod(wRentHourPeriod);
+	pNewItem->SetItemCount(nCount);
+	pNewItem->GetDesc()->m_nRarity.Set(MMIR_COMMON);
+	pNewItem->GetDesc()->m_nDamage.Set(100);
+	/*
+	int ranNum = (rand() % 100) + 1;
+	if (ranNum >= 50)
+	{
+		pNewItem->GetDesc()->m_nRarity.Set(MMIR_CELESTIAL);
+		mlog("Celestial Created");
+		MGetMatchServer()->Log(7, "CELESTIAL CREATED");
+	}
+	if (ranNum < 50)
+	{
+		pNewItem->GetDesc()->m_nRarity.Set(MMIR_MYTHICAL);
+		mlog("Mythical Created");
+		MGetMatchServer()->Log(7, "MYTHICAL CREATED");
+
+	}
+	*/
+
+
 	insert(value_type(uid, pNewItem));
 
 	if (bRentItem) m_bHasRentItem = true;

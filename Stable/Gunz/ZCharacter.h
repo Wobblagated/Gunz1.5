@@ -475,6 +475,7 @@ public:
 	///TODO: create new anistate
 	bool isPlantingBomb() { return m_dwStatusBitPackingValue.Ref().m_isPlantingBomb; } /// todo: add custom animation state
 	void setPlantingBomb(bool b) { m_dwStatusBitPackingValue.Ref().m_isPlantingBomb = b; }
+	char* enum_to_string(MMatchItemRarity type);
 protected:
 //	float m_fIconStartTime[ZCI_END];	///< 머리위에 뜨는 아이콘들
 
