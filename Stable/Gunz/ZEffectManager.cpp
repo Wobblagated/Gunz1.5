@@ -84,6 +84,7 @@ public:
 		: ZEffectAniMesh(pMesh,Pos,Dir)
 	{
 		if(pObj)
+			
 			m_uid = pObj->GetUID();
 	}
 
@@ -458,10 +459,7 @@ bool ZEffectManager::Create(void)
 	m_pBlitzEffect[4] = m_pEffectMeshMgr->Get("ef_Blitz_RadarBuff");
 	m_pBlitzEffect[5] = m_pEffectMeshMgr->Get("ef_Blitz_CombatOfficerBuff");
 	m_pBlitzEffect[6] = m_pEffectMeshMgr->Get("ef_Blitz_HonorItem");
-
-	//CUstom: palmpowtest
 	m_pPalmPow = m_pEffectMeshMgr->Get("ef_palpow_baby");
-
 	m__skip_cnt = 0;
 	m__cnt = 0;
 	m__rendered = 0;
@@ -642,7 +640,6 @@ int ZEffectManager::DeleteSameType(ZEffectAniMesh* pNew)
 	for(node = m_Effects[d].begin(); node != m_Effects[d].end(); ) {
 
 		pEffect = (*node);
-
 		if( pEffect->isEffectType( pNew->m_nType ) ) {
 				
 			if( ((ZEffectAniMesh*)pEffect)->GetUID() == pNew->GetUID() ) {
@@ -650,7 +647,7 @@ int ZEffectManager::DeleteSameType(ZEffectAniMesh* pNew)
 #ifndef _PUBLISH
 				g_EffectValidator.Erase(pEffect);
 #endif			
-				(ZEffectAniMesh*)pEffect)->GetUID();
+				
 				delete pEffect;
 				node = m_Effects[d].erase( node );
 				cnt++;
@@ -2880,7 +2877,6 @@ void ZEffectManager::AddBlitzBuff(ZCharacter* pChar, BLITZHONOREFFECT effect)
 	Add(pNew);
 }
 
-
 class ZEffectIconLoop : public ZEffectIcon { // 멤버를 추가하면 에러
 private:
 public:
@@ -2918,6 +2914,7 @@ public:
 		virtual bool Draw(unsigned long int nTime)
 		{
 			MMatchObjCache* pCache = ZGetGameClient()->FindObjCache(m_uid);
+			//if (pCache && pCache->GetUGrade() != MMUG_STAR)
 			if (pCache == nullptr)
 				return false;
 
@@ -2960,7 +2957,7 @@ void ZEffectManager::AddFlagEffect(ZObject* pObj)
 		index = 0;
 	ZEffect* pNew = new ZEffectBerserkerIconLoop(m_pFlagEffect[index], pObj);
 
-	((ZEffectBerserkerIconLoop*)pNew)->SetAlignType(0);
+	((ZEffectBerserkerIconLoop*)pNew)->SetAlignType(1);
 	((ZEffectBerserkerIconLoop*)pNew)->m_type = eq_parts_pos_info_Spine1;
 
 	Add(pNew);
@@ -3065,6 +3062,7 @@ void ZEffectManager::AddChargingEffect( ZObject *pObj )
 	rvector TargetNormal = rvector(1,0,0);
 	ZEffectCharging *pNew = new ZEffectCharging(m_pEffectMeshMgr->Get("ef_spirits.elu"),pObj->GetPosition(),TargetNormal,pObj);	
 	((ZEffectCharging*)pNew)->SetAlignType(1);
+	((ZEffectCharging*)pNew)->SetEffectType(ZET_CHARGING);
 	DeleteSameType((ZEffectAniMesh*)pNew);
 	Add(pNew);
 }
@@ -3074,7 +3072,8 @@ void ZEffectManager::AddChargedEffect( ZObject *pObj )
 	rvector TargetNormal = rvector(1,0,0);
 	ZEffectCharged *pNew = new ZEffectCharged(m_pEffectMeshMgr->Get("ef_spirits.elu_1.elu"),pObj->GetPosition(),TargetNormal,pObj);
 	((ZEffectCharged*)pNew)->SetAlignType(1);
-	//DeleteSameType((ZEffectAniMesh*)pNew);
+	((ZEffectCharging*)pNew)->SetEffectType(ZET_CHARGED);
+	DeleteSameType((ZEffectAniMesh*)pNew);
 	Add(pNew);
 }
 
@@ -3104,7 +3103,6 @@ void ZEffectManager::AddPalmPow(ZObject* pObj)
 	((ZEffectIconLoopStar*)pNew)->m_type = eq_parts_pos_info_LUpperArm;// _RMeshPartsPosInfoType(i);
 	Add(pNew);
 }
-
 
 void ZEffectManager::Add(const char* szName,const rvector& pos, const rvector& dir,const MUID& uidOwner,int nLifeTime)
 {

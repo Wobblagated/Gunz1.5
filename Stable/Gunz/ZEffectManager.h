@@ -43,6 +43,8 @@ enum ZEffectType { // 몇몇 effect 식별을 위해.. class 단위가 아님.. 같은 class �
 
 	ZET_HEAL ,
 	ZET_REPAIR,
+	ZET_CHARGING,
+	ZET_CHARGED,
 
 	ZET_END
 };
